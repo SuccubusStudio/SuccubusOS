@@ -1,0 +1,48 @@
+
+    <!DOCTYPE html>
+    <html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <title>Succubus Studio | 展示牆</title>
+        <style>
+            :root { --bg-color: #050505; --row-height: 350px; }
+            body { margin: 0; background: var(--bg-color); font-family: "Microsoft JhengHei", sans-serif; color: #cccccc; overflow-x: hidden; }
+            .gallery-container { display: flex; flex-wrap: wrap; gap: 0px; padding: 0px; }
+            .item { position: relative; height: var(--row-height); flex-grow: 1; overflow: hidden; cursor: pointer; background: #111; }
+            .item img, .item video { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; vertical-align: bottom; }
+            .item:hover img, .item:hover video { transform: scale(1.05); }
+            .overlay { position: absolute; bottom: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.85)); backdrop-filter: blur(5px); padding: 20px; opacity: 0; transition: 0.3s; pointer-events: none; box-sizing: border-box; }
+            .item:hover .overlay { opacity: 1; }
+            .content-title { font-size: 18px; font-weight: bold; margin-bottom: 6px; }
+            .content-body { font-size: 13px; color: #cccccc; line-height: 1.4; }
+            .text-block { display: flex; align-items: center; justify-content: center; text-align: center; color: #ffffff; font-weight: bold; font-size: 28px; padding: 0 50px; min-width: 300px; border: 1px solid #222; box-sizing: border-box; }
+            #lightbox { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; justify-content:center; align-items:center; cursor: zoom-out; }
+            #lightbox img, #lightbox video { max-width: 95%; max-height: 95%; box-shadow: 0 0 50px #000; }
+        </style>
+    </head>
+    <body>
+        <div class="gallery-container">
+            <div class="item" onclick="window.open('https://succubusstudio.github.io/ProCropper/', '_blank')">
+                <video src="1.mp4" autoplay loop muted playsinline></video>
+                <div class="overlay" style="">
+                    <div class="text-content">ProCrop</div>
+                </div>
+            </div>
+            <div class="item" onclick="window.open('https://succubusstudio.github.io/ProABTester/', '_blank')">
+                <video src="2.mp4" autoplay loop muted playsinline></video>
+                <div class="overlay" style="">
+                    <div class="text-content">Pro AB-TESTER</div>
+                </div>
+            </div></div>
+        <div id="lightbox" onclick="this.style.display='none'"><div id="lightbox-content"></div></div>
+        <script>
+            function openLightbox(s, t) {
+                const lb=document.getElementById('lightbox');
+                const c=document.getElementById('lightbox-content');
+                lb.style.display='flex';
+                c.innerHTML = t==='img'?`<img src="${s}">`:`<video src="${s}" controls autoplay loop></video>`;
+            }
+        </script>
+    </body>
+    </html>
+    

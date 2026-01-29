@@ -20,11 +20,9 @@
             
             .overlay { 
                 position: absolute; bottom: 0; width: 100%; 
-                /* 稍微調整漸層，讓頂部更平滑地過渡 */
                 background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 65%, transparent 100%);
                 backdrop-filter: blur(20px) saturate(180%);
                 -webkit-backdrop-filter: blur(20px) saturate(180%);
-                /* 已移除 border-top，避免出現黑線斷層 */
                 padding: 20px; opacity: 0; 
                 transform: translateY(20px);
                 transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -33,12 +31,10 @@
                 z-index: 10;
             }
 
-            /* 電腦版 Hover */
             @media (min-width: 1025px) {
                 .item:hover .overlay { opacity: 1; transform: translateY(0); }
             }
 
-            /* 手機版 Active (透過 JS 控制) */
             .item.active .overlay { opacity: 1; transform: translateY(0); }
             .item.active img, .item.active video { transform: scale(1.03); }
 
@@ -50,12 +46,18 @@
             .content-subtitle { font-size: 0.6em; opacity: 0.6; font-weight: normal; margin-left: 10px; vertical-align: baseline; }
             .content-body { font-size: 0.9em; opacity: 0.8; line-height: 1.5; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
             
+            /* --- 修改 1: Lightbox 毛玻璃效果 --- */
             #lightbox { 
                 display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-                background:rgba(0,0,0,0.98); z-index:1000; justify-content:center; align-items:center; 
+                background: rgba(0, 0, 0, 0.6); /* 降低透明度讓模糊效果可見 */
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                z-index:1000; justify-content:center; align-items:center; 
                 cursor: pointer;
             }
-            #lightbox img, #lightbox video { max-width: 98%; max-height: 98%; box-shadow: 0 0 50px rgba(0,0,0,1); pointer-events: none; }
+            #lightbox img, #lightbox video { max-width: 98%; max-height: 98%; box-shadow: 0 0 50px rgba(0,0,0,1); }
+            /* 讓影片控制項能被點擊 */
+            #lightbox video { pointer-events: auto; } 
             
             @media (max-width: 600px) { 
                 .gallery-container { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 50vw; } 
@@ -115,17 +117,40 @@
                     <div class="text-content"><div class="content-title" style="color: #ffffff;">ProCrop<span class="content-subtitle">ProCrop is a next-generation image cropping tool that can also quickly capture and crop frames from video.</span></div></div>
                 </div>
             </div></div>
-        <div id="lightbox" onclick="this.style.display='none'"><div id="lightbox-content"></div></div>
+        <div id="lightbox" onclick="closeLightbox()"><div id="lightbox-content"></div></div>
         
         <script>
             const fillers = ["DECRYPTING DATA...", "SYSTEM CALIBRATION", "MORPHOLOGICAL ANALYSIS", "[ S U C C U B U S ]"];
             let mobileObserver = null;
             
             function openLightbox(s, t) {
-                const lb=document.getElementById('lightbox');
-                const c=document.getElementById('lightbox-content');
-                lb.style.display='flex';
-                c.innerHTML = t==='img'?`<img src="${s}">`:`<video src="${s}" autoplay loop muted playsinline></video>`;
+                const lb = document.getElementById('lightbox');
+                const c = document.getElementById('lightbox-content');
+                
+                // --- 修改 2: 鎖定背景滾動 ---
+                document.body.style.overflow = 'hidden';
+                
+                lb.style.display = 'flex';
+                
+                // --- 修改 3: 影片移除 muted，加入 controls ---
+                // 圖片仍保持 pointer-events: none (CSS中設定)
+                if (t === 'img') {
+                    c.innerHTML = `<img src="${s}" style="pointer-events: none;">`;
+                } else {
+                    // video 加入 controls 以便調整音量/進度，並允許 autoplay (有時瀏覽器會擋有聲自動播放，所以 controls 很重要)
+                    c.innerHTML = `<video src="${s}" autoplay controls playsinline></video>`;
+                }
+            }
+
+            function closeLightbox() {
+                const lb = document.getElementById('lightbox');
+                const c = document.getElementById('lightbox-content');
+                
+                // 恢復滾動
+                document.body.style.overflow = '';
+                
+                lb.style.display = 'none';
+                c.innerHTML = ''; // 清空內容，停止影片播放聲音
             }
 
             function toggleMobileLogic() {
